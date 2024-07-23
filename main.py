@@ -54,11 +54,6 @@ if __name__ == '__main__':
                 print("Can't receive frame. Exiting...")
                 break
             
-            # cvtColor converts an image from one colour space to another
-            # frame = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
-            
-            # frame = cv.flip(frame, flipCode=1)
-            
             # Convert the frame received from OpenCV to a MediaPipe’s Image object.
             mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
             
@@ -67,8 +62,6 @@ if __name__ == '__main__':
             _,(result, res_img) = result_queue.get(block=True)
             
             print(result)
-            
-            # res_img = cv.flip(res_img, flipCode=1)
             
             cv.imshow('frame', res_img)
             

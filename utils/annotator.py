@@ -30,6 +30,7 @@ class Annotator:
             # Draw the hand landmarks.
             hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
             hand_landmarks_proto.landmark.extend([
+            # 1.0 - for webcam flip
             landmark_pb2.NormalizedLandmark(x=1.0-landmark.x, y=landmark.y, z=landmark.z) for landmark in hand_landmarks
             ])
             solutions.drawing_utils.draw_landmarks(
@@ -43,6 +44,7 @@ class Annotator:
             height, width, _ = annotated_image.shape
             x_coordinates = [landmark.x for landmark in hand_landmarks]
             y_coordinates = [landmark.y for landmark in hand_landmarks]
+            # 1.0 - for the webcam flip
             text_x = int((1.0 - max(x_coordinates)) * width)
             text_y = int(min(y_coordinates) * height) - self.margin
 
