@@ -25,10 +25,10 @@ class LandMarker:
     def detect(self, frame: MatLike):
         image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
 
-        # detection_result = self.detector.detect(image)
+        detection_result = self.detector.detect(image)
     
-        # annotated_image = self.annotator.draw_landmarks_on_image(image.numpy_view(), detection_result)
-        # return cv.cvtColor(annotated_image, cv.COLOR_BGR2RGB)
+        annotated_image = self.annotator.draw_landmarks_on_image(image.numpy_view(), detection_result)
+        return cv.cvtColor(annotated_image, cv.COLOR_BGR2RGB)
         return cv.cvtColor(image, cv.COLOR_RGB2BGR)
     
     
