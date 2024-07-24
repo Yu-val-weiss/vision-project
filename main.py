@@ -4,6 +4,7 @@ import cv2 as cv
 import numpy as np
 from utils.annotator import Annotator
 from utils.config import MODEL_ASSET_PATH
+from utils.landmarker import LandMarker
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
@@ -26,10 +27,14 @@ def process_res(result: vision.HandLandmarkerResult, output_image: mp.Image, tim
 
 if __name__ == '__main__':
     cap = cv.VideoCapture(0) # 0 sets to default camera (index)
+    
+    # lm = LandMarker()
 
     if not cap.isOpened():
         print("Cannot open camera")
         exit()
+        
+    pTime = 0
     
     base_options = python.BaseOptions(model_asset_path=MODEL_ASSET_PATH)
     options = vision.HandLandmarkerOptions(
@@ -37,8 +42,6 @@ if __name__ == '__main__':
         running_mode=mp.tasks.vision.RunningMode.LIVE_STREAM,
         num_hands=2,
         result_callback=process_res)
-    
-    pTime = 0
     
     with vision.HandLandmarker.create_from_options(options) as landmarker:
         while True:
@@ -58,14 +61,7 @@ if __name__ == '__main__':
             
             _,(result, res_img) = result_queue.get(block=True)
             
-            # Calculate FPS
-            cTime = time.time()
-            fps = 1 / (cTime - pTime)
-            pTime = cTime
-            
-            # Display FPS on the image
-            cv.putText(res_img, f'FPS: {int(fps)}', (10, 30), cv.FONT_HERSHEY_SIMPLEX, 1, (255, 0, 0), 2, cv.LINE_AA)
-            
+            print(result)
             
             cv.imshow('frame', res_img)
             

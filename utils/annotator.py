@@ -28,43 +28,25 @@ class Annotator:
             handedness = handedness_list[idx]
 
             # Draw the hand landmarks.
-            hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList() # type: ignore
+            hand_landmarks_proto = landmark_pb2.NormalizedLandmarkList()
             hand_landmarks_proto.landmark.extend([
             # 1.0 - for webcam flip
-            landmark_pb2.NormalizedLandmark(x=1.0-landmark.x, y=landmark.y, z=landmark.z) for landmark in hand_landmarks # type: ignore
+            landmark_pb2.NormalizedLandmark(x=1.0-landmark.x, y=landmark.y, z=landmark.z) for landmark in hand_landmarks
             ])
-            solutions.drawing_utils.draw_landmarks( # type: ignore
+            solutions.drawing_utils.draw_landmarks(
             annotated_image,
             hand_landmarks_proto,
-            solutions.hands.HAND_CONNECTIONS, # type: ignore
-            solutions.drawing_styles.get_default_hand_landmarks_style(), # type: ignore
+            solutions.hands.HAND_CONNECTIONS,
+            solutions.drawing_styles.get_default_hand_landmarks_style(),
             solutions.drawing_styles.get_default_hand_connections_style())
 
             # Get the top left corner of the detected hand's bounding box.
             height, width, _ = annotated_image.shape
-            x_coordinates = [1.0 - landmark.x for landmark in hand_landmarks] # 1.0 - for the webcam flip
+            x_coordinates = [landmark.x for landmark in hand_landmarks]
             y_coordinates = [landmark.y for landmark in hand_landmarks]
-            
-            # calculate bounding box
-            x_min = int(min(x_coordinates) * width)
-            x_max = int(max(x_coordinates) * width)
-            y_min = int(min(y_coordinates) * height)
-            y_max = int(max(y_coordinates) * height)
-            
-            box_width = x_max - x_min
-            box_height = y_max - y_min
-            x_min = max(0, x_min - int(0.1 * box_width))
-            x_max = min(width, x_max + int(0.1 * box_width))
-            y_min = max(0, y_min - int(0.1 * box_height))
-            y_max = min(height, y_max + int(0.1 * box_height))
-
-            # Draw the bounding box
-            cv.rectangle(annotated_image, (x_min, y_min), (x_max, y_max), color=(0, 255, 0), thickness=2)
-
-            
-            # Calculate text position
-            text_x = x_min
-            text_y = y_min - self.margin
+            # 1.0 - for the webcam flip
+            text_x = int((1.0 - max(x_coordinates)) * width)
+            text_y = int(min(y_coordinates) * height) - self.margin
 
             # Draw handedness (left or right hand) on the image.
             cv.putText(annotated_image, f"{handedness[0].category_name}",
