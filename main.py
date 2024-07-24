@@ -61,7 +61,7 @@ if __name__ == '__main__':
             
             _,(result, res_img) = result_queue.get(block=True)
             
-            print(result)
+            # print(result)
             
             cv.imshow('frame', res_img)
             
