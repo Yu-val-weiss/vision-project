@@ -21,6 +21,8 @@ class Annotator:
         
         handedness_list = detection_result.handedness
         annotated_image = np.copy(rgb_image)
+        
+        embed_list = []
 
         # Loop through the detected hands to visualize.
         for idx in range(len(hand_landmarks_list)):
@@ -48,9 +50,11 @@ class Annotator:
             # em = embed_to_box(x_coordinates,y_coordinates)
             # print(f"Embedding   shape: {em.shape}\nEmbedding:")
             # print(em)
-            em2 = embed_from_palm_base(x_coordinates,y_coordinates)
-            print(f"Embedding 2 shape: {em2.shape}\nEmbedding:")
-            print(em2)
+            emb = embed_from_palm_base(x_coordinates,y_coordinates)
+            # print(f"Embedding 2 shape: {emb.shape}\nEmbedding:")
+            # print(emb)
+            
+            embed_list.append(emb)
 
             # calculate bounding box
             x_min = int(min(x_coordinates) * width)
@@ -80,4 +84,4 @@ class Annotator:
                         (text_x, text_y), cv.FONT_HERSHEY_DUPLEX,
                         self.font_size, self.handedness_txt_colour, self.font_thickness, cv.LINE_AA)
 
-        return annotated_image
+        return annotated_image, embed_list
