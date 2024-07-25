@@ -1,1 +1,6 @@
 MODEL_ASSET_PATH='/Users/yuval/GitHub/vision-project/hand_landmarker.task'
+CLASS_LABELS_CSV='data/class_labels.csv'
+COLLECTED_DATA_CSV='data/collected_data.csv'
+TRAIN_CSV='data/train.csv'
+DEV_CSV='data/dev.csv'
+TEST_CSV='data/test.csv'
