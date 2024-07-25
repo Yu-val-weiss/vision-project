@@ -10,6 +10,9 @@ from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import csv
 
+import warnings
+
+
 
 class_dict = {
     ')': 10,
@@ -46,8 +49,6 @@ def record_datapoint(class_index, embedding: np.ndarray):
 
 if __name__ == '__main__':
     cap = cv.VideoCapture(0) # 0 sets to default camera (index)
-    
-    # lm = LandMarker()
 
     if not cap.isOpened():
         print("Cannot open camera")
@@ -64,65 +65,68 @@ if __name__ == '__main__':
     
     record_mode = False
     
-    with vision.HandLandmarker.create_from_options(options) as landmarker:
-        while True:
-            # reads next frame
-            ret, frame = cap.read()
-            frame_ts = int(time.time() * 1000)
-            
-            # frame read correctly -> ret is True
-            if not ret:
-                print("Can't receive frame. Exiting...")
-                break
-            
-            # Convert the frame received from OpenCV to a MediaPipe’s Image object.
-            mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
-            
-            landmarker.detect_async(mp_image, frame_ts)
-            
-            _, (embed_list, res_img) = result_queue.get(block=True)
-            
-            
-            
-            # print(embed_list)
-            if record_mode:
-                res_img = cv.putText(res_img,"Record mode", (30,30), cv.FONT_HERSHEY_DUPLEX,1,(255,0,0))
-            
-            cv.imshow('frame', res_img)
-            
-            # wait for...
-            key = cv.waitKey(1)
-            if key == ord('q'):
+    with warnings.catch_warnings():
+        warnings.simplefilter("ignore")
+        with vision.HandLandmarker.create_from_options(options) as landmarker:
+            while True:
+                # reads next frame
+                ret, frame = cap.read()
+                frame_ts = int(time.time() * 1000)
+                
+                # frame read correctly -> ret is True
+                if not ret:
+                    print("Can't receive frame. Exiting...")
+                    break
+                
+                # Convert the frame received from OpenCV to a MediaPipe’s Image object.
+                mp_image = mp.Image(image_format=mp.ImageFormat.SRGB, data=frame)
+                
+                landmarker.detect_async(mp_image, frame_ts)
+                
+                _, (embed_list, res_img) = result_queue.get(block=True)
+                
+                
+                
+                # print(embed_list)
                 if record_mode:
-                    print('Quit in record mode, printing class proportions...')
+                    res_img = cv.putText(res_img,"Record mode", (30,30), cv.FONT_HERSHEY_DUPLEX,1,(255,0,0))
+                
+                cv.imshow('frame', res_img)
+                
+                # wait for...
+                key = cv.waitKey(1)
+                if key == ord('q'):
+                    if record_mode:
+                        print('Quit in record mode, printing class proportions...')
+                        check_class_proportions()
+                    break
+                
+                elif key == ord('r'):
+                    record_mode = not record_mode
+                    print(f"\n\n{'!!  Entered' if record_mode else 'Exited'} record mode  !!\n")
+                    print('Class proportions...')
                     check_class_proportions()
-                break
-            
-            elif key == ord('r'):
-                record_mode = not record_mode
-                print(f"\n\n{'!!  Entered' if record_mode else 'Exited'} record mode  !!\n")
-                print('Class proportions...')
-                check_class_proportions()
-                    
-            elif key != -1:
-                if record_mode:
-                    if len(embed_list) == 0:
-                        print('No hands found to record')
-                        continue
-                    if len(embed_list) > 1:
-                        print('More than one hand found, skipped recording')
-                        continue
-                    c = chr(key)
-                    if c.isdigit():
-                        for emb in embed_list:
-                            record_datapoint(int(c), emb)
-                        print(f'Recorded {int(c)}')
-                    elif c in class_dict:
-                        for emb in embed_list:
-                            record_datapoint(class_dict[c], emb)
-                        print(f'Recorded {class_dict[c]}')
-                    else:
-                        print(f"Invalid key {c}")
+                        
+                elif key != -1:
+                    if record_mode:
+                        c = chr(key)
+                        if c == 'c':
+                            print('Checking class proportions...')
+                            check_class_proportions()
+                        elif len(embed_list) == 0:
+                            print('No hands found to record')
+                        elif len(embed_list) > 1:
+                            print('More than one hand found, skipped recording')
+                        elif c.isdigit():
+                            for emb in embed_list:
+                                record_datapoint(int(c), emb)
+                            print(f'Recorded {int(c)}')
+                        elif c in class_dict:
+                            for emb in embed_list:
+                                record_datapoint(class_dict[c], emb)
+                            print(f'Recorded {class_dict[c]}')
+                        else:
+                            print(f"Invalid key {c}")
             
             
             
