@@ -3,6 +3,7 @@ import torch
 from model.model import GestureModel
 import torch.optim as optim
 from torch import nn
+from utils.config import MODEL_PATH
 from utils.data import GestureDataset
 from utils.config import *
 from torch.utils.data import DataLoader
@@ -10,7 +11,6 @@ from tqdm import tqdm
 
 NUM_EPOCHS = 10
 BATCH_SIZE = 8
-MODEL_PATH = 'model/trained_models'
 
 if __name__ == '__main__':
     mod = GestureModel()
@@ -22,11 +22,10 @@ if __name__ == '__main__':
     optimizer = optim.SGD(mod.parameters(), lr=0.001, momentum=0.9)
 
     ds_train = GestureDataset(TRAIN_CSV)
-
-    dl_train = DataLoader(GestureDataset(COLLECTED_DATA_CSV), batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
+    dl_train = DataLoader(ds_train, batch_size=BATCH_SIZE, shuffle=True, num_workers=0)
     
-    ds_dev = GestureDataset(DEV_CSV)
-    dl_dev = DataLoader(GestureDataset(COLLECTED_DATA_CSV), batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
+    ds_test = GestureDataset(TEST_CSV)
+    dl_test = DataLoader(ds_test, batch_size=BATCH_SIZE, shuffle=False, num_workers=0)
         
     for epoch in tqdm(range(NUM_EPOCHS),desc='Traversing epochs'):
         running_loss = 0.0
@@ -56,7 +55,7 @@ if __name__ == '__main__':
         with torch.no_grad():
             total = 0
             correct = 0
-            for data in dl_dev:
+            for data in dl_test:
                 labels, landmarks = data
                 if torch.backends.mps.is_available():
                     labels = labels.to('mps:0')
