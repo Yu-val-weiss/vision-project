@@ -1,5 +1,7 @@
 class_index,class_label
 0,THUMBS_UP
 1,THUMBS_DOWN
-2,OK
-5,STOP
+2,PEACE
+3,F_YOU
+4,OK
+5,CALL_ME
