@@ -3,7 +3,7 @@ import torch
 from model.model import GestureModel
 import torch.optim as optim
 from torch import nn
-from utils.config import MODEL_PATH
+from utils.config import GESTURE_MODEL_PATH
 from utils.data import GestureDataset
 from utils.config import *
 from torch.utils.data import DataLoader
@@ -69,6 +69,6 @@ if __name__ == '__main__':
               
             print(f'Accuracy for epoch {epoch}: {correct/total:.2f}')
                 
-        torch.save(mod.state_dict(), os.path.join(MODEL_PATH, f'model_{epoch}'))
+        torch.save(mod.state_dict(), os.path.join(GESTURE_MODEL_PATH, f'model_{epoch}'))
              
     

@@ -1,15 +1,17 @@
+import os
 from queue import PriorityQueue
 import time
 import cv2 as cv
 import numpy as np
+from model.model import GestureModel
 from utils.annotator import Annotator
-from utils.config import MODEL_ASSET_PATH, COLLECTED_DATA_CSV
+from utils.config import MODEL_ASSET_PATH, COLLECTED_DATA_CSV, GESTURE_MODEL_PATH
 from utils.data import check_class_proportions
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
 import csv
-
+import torch
 import warnings
 
 
@@ -28,9 +30,10 @@ class_dict = {
 }
 
 
-annotator = Annotator()
+annotator = Annotator(load_model='model_9')
 
 result_queue = PriorityQueue()
+
 
 def process_res(result: vision.HandLandmarkerResult, output_image: mp.Image, timestamp_ms: int):
     try:
@@ -64,6 +67,7 @@ if __name__ == '__main__':
         result_callback=process_res)
     
     record_mode = False
+    
     
     with warnings.catch_warnings():
         warnings.simplefilter("ignore")
