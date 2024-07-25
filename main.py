@@ -4,7 +4,6 @@ import cv2 as cv
 import numpy as np
 from utils.annotator import Annotator
 from utils.config import MODEL_ASSET_PATH
-from utils.landmarker import LandMarker
 import mediapipe as mp
 from mediapipe.tasks import python
 from mediapipe.tasks.python import vision
@@ -19,8 +18,8 @@ def process_res(result: vision.HandLandmarkerResult, output_image: mp.Image, tim
         output_ndarray = output_image.numpy_view()
         copied_ndarray = np.copy(output_ndarray)
         img = cv.flip(copied_ndarray, flipCode=1)
-        img = annotator.draw_landmarks_on_image(img,result)
-        result_queue.put((timestamp_ms, (result, img)))
+        img, embed_list = annotator.draw_landmarks_on_image(img,result)
+        result_queue.put((timestamp_ms, (embed_list, img)))
     except Exception as e:
         print(f"Error processing results: {e}")
     
@@ -43,6 +42,8 @@ if __name__ == '__main__':
         num_hands=2,
         result_callback=process_res)
     
+    record_mode = False
+    
     with vision.HandLandmarker.create_from_options(options) as landmarker:
         while True:
             # reads next frame
@@ -59,15 +60,22 @@ if __name__ == '__main__':
             
             landmarker.detect_async(mp_image, frame_ts)
             
-            _,(result, res_img) = result_queue.get(block=True)
+            _, (embed_list, res_img) = result_queue.get(block=True)
             
-            # print(result)
+            
+            
+            # print(embed_list)
             
             cv.imshow('frame', res_img)
             
             # wait for...
-            if cv.waitKey(1) == ord('q'):
+            key = cv.waitKey(1)
+            if key == ord('q'):
                 break
+            elif key == ord('r'):
+                record_mode = not record_mode
+                print(f"{'Entered' if record_mode else 'Exited'} record mode")
+            
             
             
     cap.release()
