@@ -1,4 +1,4 @@
-A quick computer vision project that is able to recognise 7 different gestures live on a webcam.
+A quick computer vision project that is able to recognise 7 different gestures live on a webcam. Uses OpenCV and Google's MediaPipe.
 
 1. THUMBS_UP
 2. THUMBS_DOWN
